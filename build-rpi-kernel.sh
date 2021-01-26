@@ -7,8 +7,8 @@ set -eu
 # Based on https://www.raspberrypi.org/documentation/linux/kernel/building.md
 
 # Load functions, environment variables and dependencies
-. functions.sh;
 . env.sh;
+. functions.sh;
 
 #Program logic
 main(){
@@ -21,21 +21,20 @@ main(){
   local delete_build=$(check_build_dir_exists);
   if (( $delete_build == 1 )); then
     rm -rf "$_BUILD_DIR";
+    
+    #if a branch is set download that branch, otherwise get the head
+    if [ -z "${_BRANCH}" ]; then
+      git clone --depth=1 "$_SOURCE_URL" "$_BUILD_DIR" 
+    else
+      git clone --depth=1 --branch "$_BRANCH" "$_SOURCE_URL" "$_BUILD_DIR"
+    fi
   fi
   
   #Optimize for arm
   if [[ $_BUILD_ON_ARM == 'y' ]]; then
     MAKE_COMMAND="make -j4"
   fi
-  
-  #if a branch is set download that branch, otherwise get the head
-  if [[ $( check_variable_is_set $_BRANCH ) ]]; then
-    git clone --depth=1 --branch "$_BRANCH" "$_SOURCE_URL" "$_BUILD_DIR"
-  else
-    git clone --depth=1 "$_SOURCE_URL" "$_BUILD_DIR"
-  fi
-  
-  declare -xr KERNEL=$_PI_KERNEL_VERSION 
+    
   cd $_BUILD_DIR
   
   #decide if building for rpi4 64bit or not

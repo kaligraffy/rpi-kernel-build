@@ -11,6 +11,7 @@ declare -xr _COLOR_DEBUG='\033[0;37m' #grey
 declare -xr _COLOR_NORMAL='\033[0m' # No Color
 declare -xr _LOG_FILE="${_BASE_DIR}/build-$(date '+%Y-%m-%d-%H:%M:%S').log"
 declare MAKE_COMMAND="make"
+declare -xr KERNEL=$_PI_KERNEL_VERSION 
 
 # Runs on script exit, tidies up the mounts.
 trap_on_exit(){
@@ -71,14 +72,5 @@ echo_debug(){
   fi
   #even if output is suppressed by log level output it to the log file
   echo "$(date '+%H:%M:%S'): $@" >> "${_LOG_FILE}";
-}
-
-#checks if a variable is set or empty ''
-check_variable_is_set(){
-  if [[ -z "${1}" ]]; then
-    echo '1';
-    return;
-  fi
-  echo '0';
 }
 
